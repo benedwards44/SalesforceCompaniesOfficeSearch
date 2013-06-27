@@ -1,0 +1,357 @@
+<apex:page standardController="Account" extensions="CompaniesOfficeSearchExCon" title="Companies Search - {!Account.Name}">
+
+	<apex:includeScript value="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js" />
+	<apex:outputPanel id="scripts">
+	<script>
+		function renderCheckboxes(rowNum){
+		
+			hideCheckboxes();
+		
+			$('.copyName'+rowNum).show();
+		
+			$('.copyNumber'+rowNum).show();
+			if ('{!account.Company_number__c}' == null || '{!account.Company_number__c}' == '') {
+				$('.copyNumber'+rowNum).prop('checked', true);
+				copyNumber(rowNum,$('span.numberValue'+rowNum).text());
+			}
+			
+			$('.copyType'+rowNum).show();
+			if ('{!account.Entity_Type__c}' == null || '{!account.Entity_Type__c}' == '') {
+				$('.copyType'+rowNum).prop('checked', true);
+				copyType(rowNum,$('span.typeValue'+rowNum).text());
+			}
+			
+			$('.copyStatus'+rowNum).show();
+			if ('{!account.Company_Status__c}' == null || '{!account.Company_Status__c}' == '') {
+				$('.copyStatus'+rowNum).prop('checked', true);
+				copyStatus(rowNum,$('span.statusValue'+rowNum).text());
+			}
+			
+			$('.copyBilling'+rowNum).show();
+			if ('{!account.BillingStreet}' == null || '{!account.BillingStreet}' == '') {
+				copyBilling(rowNum,$('span.billingStreetValue'+rowNum).text(),
+									$('span.billingCityValue'+rowNum).text(),
+									$('span.billingStateValue'+rowNum).text(),
+									$('span.billingPostalCodeValue'+rowNum).text()
+							);
+									
+			}
+			
+			$('.copyShipping'+rowNum).show();
+			if ('{!account.ShippingStreet}' == null || '{!account.ShippingStreet}' == '') {
+				copyShipping(rowNum,$('span.shippingStreetValue'+rowNum).text(),
+									$('span.shippingCityValue'+rowNum).text(),
+									$('span.shippingStateValue'+rowNum).text(),
+									$('span.shippingPostalCodeValue'+rowNum).text()
+							);
+			}
+		}
+		
+		function hideCheckboxes(){
+			$('input[class*=copyName]').removeAttr('checked');
+			$('input[class*=copyNumber]').removeAttr('checked');
+			$('input[class*=copyType]').removeAttr('checked');
+			$('input[class*=copyStatus]').removeAttr('checked');
+			$('input[class*=copyBilling]').removeAttr('checked');
+			$('input[class*=copyShipping]').removeAttr('checked');
+			$('input[class*=copyName]').hide();
+			$('input[class*=copyNumber]').hide();
+			$('input[class*=copyType]').hide();
+			$('input[class*=copyStatus]').hide();
+			$('input[class*=copyBilling]').hide();
+			$('input[class*=copyShipping]').hide();
+		}
+		
+		function copyName(rowNum,valueChange){
+			if ( $('input.copyName'+rowNum).is(':checked') ){
+				$('input[id*="accountName"]').val(valueChange);
+			} else {
+				$('input[id*="accountName"]').val('{!account.name}');
+			}
+		}
+		function copyNumber(rowNum,valueChange){
+			if ( $('input.copyNumber'+rowNum).is(':checked') ){
+				$('span[id*="company_number__c"]').html('<strong style="color:#900">' + valueChange + '</strong>');
+				$('input[id*="inputCompany_number__c"]').val(valueChange);
+			} else {
+				$('span[id*="company_number__c"]').text('{!account.Company_number__c}');
+				$('input[id*="inputCompany_number__c"]').val('{!account.Company_number__c}');
+			}
+		}
+		function copyType(rowNum,valueChange){
+			if ( $('input.copyType'+rowNum).is(':checked') ){
+				$('span[id*="accountType"]').html('<strong style="color:#900">' + valueChange + '</strong>');
+				$('input[id*="inputAccountType"]').val(valueChange);
+			} else {
+				$('span[id*="accountType"]').text('{!account.Entity_Type__c}');
+				$('input[id*="inputAccountType"]').val('{!account.Entity_Type__c}');
+			}
+		}
+		function copyStatus(rowNum,valueChange){
+			if ( $('input.copyStatus'+rowNum).is(':checked') ){
+				$('span[id*="accountStatus"]').html('<strong style="color:#900">' + valueChange + '</strong>');
+				$('input[id*="inputAccountStatus"]').val(valueChange);
+			} else {
+				$('span[id*="accountStatus"]').text('{!account.Company_Status__c}');
+				$('input[id*="inputAccountStatus"]').val('{!account.Company_Status__c}');
+			}
+		}
+		function copyBilling(rowNum,street, city, state, postalcode){
+			if ( $('input.copyBilling'+rowNum).is(':checked') ){
+			
+				$('span[id*="accountBillingStreet"]').html('<strong style="color:#900">' + street + '</strong>');
+				$('input[id*="inputAccountBillingStreet"]').val(street);
+				
+				$('span[id*="accountBillingCity"]').html('<strong style="color:#900">' + city + '</strong>');
+				$('input[id*="inputAccountBillingCity"]').val(city);
+				
+				$('span[id*="accountBillingState"]').html('<strong style="color:#900">' + state + '</strong>');
+				$('input[id*="inputAccountBillingState"]').val(state);
+				
+				$('span[id*="accountBillingPostalCode"]').html('<strong style="color:#900">' + postalcode + '</strong>');
+				$('input[id*="inputAccountBillingPostalCode"]').val(postalcode);
+				
+			} else {
+				$('span[id*="accountBillingStreet"]').text('{!account.BillingStreet}');
+				$('input[id*="inputAccountBillingStreet"]').val('{!account.BillingStreet}');
+				
+				$('span[id*="accountBillingCity"]').text('{!account.BillingCity}');
+				$('input[id*="inputAccountBillingCity"]').val('{!account.BillingCity}');
+				
+				$('span[id*="accountBillingState"]').text('{!account.BillingState}');
+				$('input[id*="inputAccountBillingState"]').val('{!account.BillingState}');
+				
+				$('span[id*="accountBillingPostalCode"]').text('{!account.BillingPostalCode}');
+				$('input[id*="inputAccountBillingPostalCode"]').val('{!account.BillingPostalCode}');
+
+			}
+		}
+		
+		function copyShipping(rowNum,street, city, state, postalcode){
+			if ( $('input.copyShipping'+rowNum).is(':checked') ){
+			
+				$('span[id*="accountShippingStreet"]').html('<strong style="color:#900">' + street + '</strong>');
+				$('input[id*="inputAccountShippingStreet"]').val(street);
+				
+				$('span[id*="accountShippingCity"]').html('<strong style="color:#900">' + city + '</strong>');
+				$('input[id*="inputAccountShippingCity"]').val(city);
+				
+				$('span[id*="accountShippingState"]').html('<strong style="color:#900">' + state + '</strong>');
+				$('input[id*="inputAccountShippingState"]').val(state);
+				
+				$('span[id*="accountShippingPostalCode"]').html('<strong style="color:#900">' + postalcode + '</strong>');
+				$('input[id*="inputAccountShippingPostalCode"]').val(postalcode);
+				
+			} else {
+				$('span[id*="accountShippingStreet"]').text('{!account.ShippingStreet}');
+				$('input[id*="inputAccountShippingStreet"]').val('{!account.ShippingStreet}');
+				
+				$('span[id*="accountShippingCity"]').text('{!account.ShippingCity}');
+				$('input[id*="inputAccountShippingCity"]').val('{!account.ShippingCity}');
+				
+				$('span[id*="accountShippingState"]').text('{!account.ShippingState}');
+				$('input[id*="inputAccountShippingState"]').val('{!account.ShippingState}');
+				
+				$('span[id*="accountShippingPostalCode"]').text('{!account.ShippingPostalCode}');
+				$('input[id*="inputAccountShippingPostalCode"]').val('{!account.ShippingPostalCode}');
+
+			}
+		}
+		
+		$(document).ready(function() {
+			$('td[class*=contactsRow]').parent().hide();
+			$('.contactsRow{!selectedRecordNo}').parent().show();
+			renderCheckboxes({!selectedRecordNo});
+		});
+	</script>
+	</apex:outputPanel>
+
+	<apex:sectionHeader title="{!Account.Name}" subtitle="Search Companies Office" />
+	
+	<apex:form id="pageForm">
+		<!--  Hidden input used to save any changes/selections made  -->
+		<apex:inputText value="{!sfAccount.Company_Number__c}" id="inputCompany_number__c" style="display:none;"  />
+		<apex:inputText value="{!sfAccount.Entity_Type__c}" id="inputAccountType" style="display:none;"  />
+		<apex:inputText value="{!sfAccount.Company_Status__c}" id="inputAccountStatus" style="display:none;"  />	
+		<apex:inputText value="{!sfAccount.BillingStreet}" id="inputAccountBillingStreet" style="display:none;" />
+		<apex:inputText value="{!sfAccount.BillingCity}" id="inputAccountBillingCity" style="display:none;" />	
+		<apex:inputText value="{!sfAccount.BillingState}" id="inputAccountBillingState" style="display:none;" />	
+		<apex:inputText value="{!sfAccount.BillingPostalCode}" id="inputAccountBillingPostalCode" style="display:none;" />
+		<apex:inputText value="{!sfAccount.ShippingStreet}" id="inputAccountShippingStreet" style="display:none;" />
+		<apex:inputText value="{!sfAccount.ShippingCity}" id="inputAccountShippingCity" style="display:none;" />	
+		<apex:inputText value="{!sfAccount.ShippingState}" id="inputAccountShippingState" style="display:none;" />	
+		<apex:inputText value="{!sfAccount.ShippingPostalCode}" id="inputAccountShippingPostalCode" style="display:none;" />	
+		
+		<apex:pageBlock title="Companies Office Verification">
+			<apex:pageMessages id="pageMessages" />
+			
+			<apex:pageBlockButtons location="top" >
+				<apex:commandButton value="Save" action="{!saveAccountsAndContacts}" />
+				<apex:commandButton value="Cancel" action="{!cancel}" />
+			</apex:pageBlockButtons>
+			
+			<apex:pageBlockSection title="Current Organisation Details" >
+				<apex:inputText value="{!sfAccount.Name}" id="accountName" style="width:90%" required="true" />
+				<apex:outputField value="{!Account.Company_Number__c}" id="company_number__c" />
+				<apex:outputField value="{!Account.Entity_Type__c}" id="accountType" />
+				<apex:outputField value="{!Account.Company_Status__c}" id="accountStatus" />	
+				<apex:pageBlockSectionItem >
+					<apex:outputLabel value="Billing Address" />
+					<apex:outputText >
+						<span id="accountBillingStreet">{!account.BillingStreet}</span> <br/>
+						<span id="accountBillingCity">{!account.BillingCity}</span> <br/>
+						<span id="accountBillingState">{!account.BillingState}</span>&nbsp;<span id="accountBillingPostalCode">{!account.BillingPostalCode}</span>
+					</apex:outputText>
+				</apex:pageBlockSectionItem>
+				<apex:pageBlockSectionItem >
+					<apex:outputLabel value="Shipping Address" />
+					<apex:outputText >
+						<span id="accountShippingStreet">{!account.ShippingStreet}</span> <br/>
+						<span id="accountShippingCity">{!account.ShippingCity}</span> <br/>
+						<span id="accountShippingState">{!account.ShippingState}</span>&nbsp;<span id="accountShippingPostalCode">{!account.ShippingPostalCode}</span>
+					</apex:outputText>
+				</apex:pageBlockSectionItem>
+			</apex:pageBlockSection>
+			
+			<br/>
+			
+			<apex:outputPanel layout="block" style="width:100%;">
+				
+				<apex:outputPanel layout="block" style="width:100px; margin-left: 40%; float:left;">
+					<apex:commandButton value="Search" action="{!searchAgain}" reRender="pageForm,scripts" status="searchStatus" />
+				</apex:outputPanel>
+				
+				<apex:outputPanel layout="block" style="float:left;">
+					<apex:actionStatus id="searchStatus">
+						<apex:facet name="start">
+							<apex:outputText >
+								<apex:image value="/img/loading.gif" />
+								&nbsp;&nbsp; Searching Companies Office...
+							</apex:outputText>
+						</apex:facet>
+					</apex:actionStatus>
+				</apex:outputPanel>
+			</apex:outputPanel>
+			
+			<apex:outputPanel layout="block" style="clear:both;" />
+			
+			<apex:pageBlockSection title="Search Results" columns="1" id="searchResults">
+				
+				<apex:pageBlockTable value="{!companiesSearchResults}" var="company" id="companiesTable" rendered="{!companiesSearchResults.size > 0}">
+					<apex:column id="selectColumn" >
+						<apex:commandLink styleClass="btn" style="text-decoration:none" onclick="renderCheckboxes('{!company.recordNo}');" action="{!selectCompany}" reRender="pageForm,scripts" status="loadingAddressStatus">
+							Select 
+							<apex:param value="{!company.recordNo}" name="recordNo" assignTo="{!selectedRecordNo}" />
+						</apex:commandLink>
+						<apex:actionStatus id="loadingAddressStatus">
+							<apex:facet name="start">
+								<apex:image value="/img/loading.gif" />
+							</apex:facet>
+						</apex:actionStatus>
+					</apex:column>
+					<apex:column headerValue="Company Name">
+						<span class="copyName{!company.recordNo}" style="display:none;">
+							<apex:inputCheckbox styleClass="copyName{!company.recordNo}" onChange="copyName({!company.recordNo},'{!company.account.Name}')"  />
+							&nbsp;&nbsp;
+						</span>
+						<apex:outputText value="{!company.account.Name}" />
+					</apex:column>
+					<apex:column headerValue="Company #">
+						<span class="copyNumber{!company.recordNo}" style="display:none;">
+							<apex:inputCheckbox styleClass="copyNumber{!company.recordNo}" onChange="copyNumber({!company.recordNo},'{!company.account.Company_Number__c}')"  />
+							&nbsp;&nbsp;
+						</span>
+						<apex:outputText value="{!company.account.Company_Number__c}" styleClass="numberValue{!company.recordNo}" />
+					</apex:column>
+					<apex:column headerValue="Entity Type">
+						<span class="copyType{!company.recordNo}" style="display:none;">
+							<apex:inputCheckbox styleClass="copyType{!company.recordNo}" onChange="copyType({!company.recordNo},'{!company.account.Entity_Type__c}')"/>
+							&nbsp;&nbsp;
+						</span>
+						<apex:outputText value="{!company.account.Entity_Type__c}" styleClass="typeValue{!company.recordNo}" />
+					</apex:column>
+					<apex:column headerValue="Status">
+						<span class="copyStatus{!company.recordNo}" style="display:none;">
+							<apex:inputCheckbox styleClass="copyStatus{!company.recordNo}" onChange="copyStatus({!company.recordNo},'{!company.account.Company_Status__c}')" />
+							&nbsp;&nbsp;
+						</span>
+						<apex:outputText value="{!company.account.Company_Status__c}" styleClass="statusValue{!company.recordNo}" />
+					</apex:column>
+					
+					<apex:column headerValue="Registered Office">
+						<span class="copyBilling{!company.recordNo}" style="display:none;">
+							<apex:inputCheckbox styleClass="copyBilling{!company.recordNo}"
+								onChange="copyBilling(
+														{!company.recordNo},
+														'{!company.account.BillingStreet}',
+														'{!company.account.BillingCity}',
+														'{!company.account.BillingState}',
+														'{!company.account.BillingPostalCode}');" />
+							&nbsp;&nbsp;
+						</span>
+						<apex:outputText >
+							<span class="billingStreetValue{!company.recordNo}">{!company.account.BillingStreet}</span>,&nbsp;
+							<span class="billingCityValue{!company.recordNo}">{!company.account.BillingCity}</span>,&nbsp;
+							<span class="billingStateValue{!company.recordNo}">{!company.account.BillingState}</span>&nbsp;<span class="billingPostalCodeValue{!company.recordNo}">{!company.account.BillingPostalCode}</span>
+						</apex:outputText>
+					</apex:column>
+					
+					<apex:column headerValue="Address For Service" rendered="{!renderServiceAddress}">
+						<span class="copyShipping{!company.recordNo}" style="display:none;">
+							<apex:inputCheckbox styleClass="copyShipping{!company.recordNo}"
+								onChange="copyShipping(
+														{!company.recordNo},
+														'{!selectedAccount.account.ShippingStreet}',
+														'{!selectedAccount.account.ShippingCity}',
+														'{!selectedAccount.account.ShippingState}',
+														'{!selectedAccount.account.ShippingPostalCode}');" />
+							&nbsp;&nbsp;
+						</span>
+						<apex:outputText >
+							<span class="ShippingStreetValue{!company.recordNo}">{!selectedAccount.account.ShippingStreet}</span>,&nbsp;
+							<span class="ShippingCityValue{!company.recordNo}">{!selectedAccount.account.ShippingCity}</span>,&nbsp;
+							<span class="ShippingStateValue{!company.recordNo}">{!selectedAccount.account.ShippingState}</span>&nbsp;<span class="ShippingPostalCodeValue{!company.recordNo}">{!selectedAccount.account.ShippingPostalCode}</span>
+						</apex:outputText>
+					</apex:column>
+
+					<apex:column breakBefore="true" styleClass="contactsRow{!company.recordNo}" />
+					<apex:column colspan="5" id="contactsColumn">
+						<apex:actionStatus id="loadingContactsStatus">
+							<apex:facet name="start">
+								<apex:outputText >
+									Loading Contacts&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+									<apex:image value="/img/loading.gif" />
+								</apex:outputText>
+							</apex:facet>
+							<apex:facet name="stop">
+								<apex:pageBlockTable value="{!selectedAccount.contacts}" var="contact">
+									<apex:column headerValue="Create Contact" width="10%">
+										<apex:inputCheckbox value="{!contact.insertContact}" />
+									</apex:column>
+									<apex:column headerValue="First Name">
+										{!contact.contact.firstname}
+									</apex:column>
+									<apex:column headerValue="Last Name">
+										{!contact.contact.lastname}
+									</apex:column>
+									<apex:column headerValue="Physical Address" width="70%">
+										{!contact.contact.OtherStreet},&nbsp;
+										{!contact.contact.OtherCity},&nbsp;	
+										{!contact.contact.OtherState}&nbsp;{!contact.contact.OtherPostalCode}
+									</apex:column>
+								</apex:pageBlockTable>
+							</apex:facet>
+						</apex:actionStatus>
+					</apex:column>
+
+				</apex:pageBlockTable>
+				
+				<apex:outputPanel rendered="{!companiesSearchResults.size == 0}">
+					No results found.
+				</apex:outputPanel>
+				
+			</apex:pageBlockSection>
+		</apex:pageBlock>
+	</apex:form>
+
+</apex:page>
